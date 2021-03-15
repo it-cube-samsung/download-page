@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Pair;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -14,7 +15,11 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -34,11 +39,17 @@ public class MainActivity extends AppCompatActivity {
 
     public void goClick(View v) {
         contentTextView.setText("Loading...");
-        DownloadPage task = new DownloadPage();
+        DownloadContent task = new DownloadContent();
+        String url = "https://www.listchallenges.com/200-most-famous-people-of-all-time/vote";
 
         try {
-            String result = task.execute("https://" + urlEditText.getText().toString()).get();
-            contentTextView.setText(result);
+            ArrayList<Pair<String, String>> pairs = task.execute("https://www.listchallenges.com", "/200-most-famous-people-of-all-time/vote").get();
+            StringBuilder sb = new StringBuilder();
+            for (Pair<String, String> pair : pairs) {
+                sb.append(pair.toString());
+                sb.append("\n");
+            }
+            contentTextView.setText(sb.toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
