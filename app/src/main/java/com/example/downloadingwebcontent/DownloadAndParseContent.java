@@ -8,11 +8,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class DownloadContent extends AsyncTask<String, Void, ArrayList<Pair<String, String>>> {
+public class DownloadAndParseContent extends AsyncTask<String, Void, ArrayList<Pair<String, String>>> {
 
     @Override
     protected ArrayList<Pair<String, String>> doInBackground(String... params) {
@@ -22,7 +23,7 @@ public class DownloadContent extends AsyncTask<String, Void, ArrayList<Pair<Stri
             String host = params[0];
             String path = params[1];
             URL url = new URL(host + path);
-            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+            URLConnection urlConnection = url.openConnection();
 
             InputStream in = urlConnection.getInputStream();
             InputStreamReader reader = new InputStreamReader(in);

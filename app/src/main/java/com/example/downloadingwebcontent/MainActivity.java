@@ -2,54 +2,109 @@ package com.example.downloadingwebcontent;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.os.AsyncTask;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Pair;
 import android.view.View;
-import android.widget.EditText;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
-import javax.net.ssl.HttpsURLConnection;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     TextView contentTextView;
-    EditText urlEditText;
+    ArrayList<String> list;
+    ImageView imageView;
+    ArrayList<String> comments;
+    ListView listView;
+    ArrayAdapter<String> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        contentTextView = findViewById(R.id.contentTextView);
-        urlEditText = findViewById(R.id.urlEditText);
 
+//        // download page
+//        setContentView(R.layout.activity_main);
+//        contentTextView = findViewById(R.id.contentTextView);
+
+        // download and parse content
+        setContentView(R.layout.activity_main_parse_content);
+        list = new ArrayList<>();
+        listView = findViewById(R.id.listView);
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, list);
+        listView.setAdapter(adapter);
+
+//        // download image
+//        setContentView(R.layout.activity_main_image);
+//        imageView = findViewById(R.id.imageView);
+
+//        // download json
+//        setContentView(R.layout.activity_main_json);
+//        comments = new ArrayList<>();
+//        listView = findViewById(R.id.listView);
+//        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, comments);
+//        listView.setAdapter(adapter);
 
     }
 
-    public void goClick(View v) {
+    public void downloadPage(View v) {
         contentTextView.setText("Loading...");
-        DownloadContent task = new DownloadContent();
-        String url = "https://www.listchallenges.com/200-most-famous-people-of-all-time/vote";
+        DownloadPage task = new DownloadPage();
+        try {
+            String url = "https://www.listchallenges.com/200-most-famous-people-of-all-time/vote";
+            String result = task.execute(url).get();
+            contentTextView.setText(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
+    public void downloadAndParseContent(View v) {
+        DownloadAndParseContent task = new DownloadAndParseContent();
+        list.clear();
         try {
             ArrayList<Pair<String, String>> pairs = task.execute("https://www.listchallenges.com", "/200-most-famous-people-of-all-time/vote").get();
-            StringBuilder sb = new StringBuilder();
             for (Pair<String, String> pair : pairs) {
-                sb.append(pair.toString());
-                sb.append("\n");
+                list.add(pair.toString());
             }
-            contentTextView.setText(sb.toString());
+
+            adapter.notifyDataSetChanged();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void downloadImage(View view) {
+        DownloadImage task = new DownloadImage();
+        try {
+            Bitmap bitmap = task.execute("https://upload.wikimedia.org/wikipedia/en/thumb/a/aa/Bart_Simpson_200px.png/170px-Bart_Simpson_200px.png").get();
+            imageView.setImageBitmap(bitmap);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void downloadJSON(View v) {
+        DownloadPage task = new DownloadPage();
+        try {
+            String json = task.execute("https://jsonplaceholder.typicode.com/comments?postId=1").get();
+            JSONArray jsonArray = new JSONArray(json);
+            comments.clear();
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+//                String body = jsonObject.getString("body");
+//                comments.add(body);
+                Comment comment = new Comment(jsonObject);
+                comments.add(comment.body);
+            }
+            adapter.notifyDataSetChanged();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
