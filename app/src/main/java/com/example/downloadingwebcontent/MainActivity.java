@@ -20,9 +20,9 @@ public class MainActivity extends AppCompatActivity {
     TextView contentTextView;
     ArrayList<String> list;
     ImageView imageView;
-    ArrayList<String> comments;
+    ArrayList<Comment> comments;
     ListView listView;
-    ArrayAdapter<String> adapter;
+    MusicAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,23 +32,24 @@ public class MainActivity extends AppCompatActivity {
 //        setContentView(R.layout.activity_main);
 //        contentTextView = findViewById(R.id.contentTextView);
 
-        // download and parse content
-        setContentView(R.layout.activity_main_parse_content);
-        list = new ArrayList<>();
-        listView = findViewById(R.id.listView);
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, list);
-        listView.setAdapter(adapter);
+//        // download and parse content
+//        setContentView(R.layout.activity_main_parse_content);
+//        list = new ArrayList<>();
+//        listView = findViewById(R.id.listView);
+//        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, list);
+//        listView.setAdapter(adapter);
 
 //        // download image
 //        setContentView(R.layout.activity_main_image);
 //        imageView = findViewById(R.id.imageView);
 
-//        // download json
-//        setContentView(R.layout.activity_main_json);
-//        comments = new ArrayList<>();
-//        listView = findViewById(R.id.listView);
+        // download json
+        setContentView(R.layout.activity_main_json);
+        comments = new ArrayList<>();
+        listView = findViewById(R.id.listView);
 //        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, comments);
-//        listView.setAdapter(adapter);
+        adapter = new MusicAdapter(this, comments);
+        listView.setAdapter(adapter);
 
     }
 
@@ -101,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
 //                String body = jsonObject.getString("body");
 //                comments.add(body);
                 Comment comment = new Comment(jsonObject);
-                comments.add(comment.body);
+                comments.add(comment);
             }
             adapter.notifyDataSetChanged();
 
